@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased selection:bg-blue-500/30;
+  }
+}
+
+.glass {
+  @apply bg-white/70 backdrop-blur-xl border border-white shadow-xl shadow-slate-200/50;
+}
+
+.glass-dark {
+  @apply bg-slate-50/50 backdrop-blur-md border border-slate-200 shadow-sm;
+}
+
+.tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.glow-blue {
+  box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
+}
+
+.glow-blue-subtle {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.05);
+}
