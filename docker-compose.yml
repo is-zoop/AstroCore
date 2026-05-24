@@ -2,16 +2,26 @@ services:
   astrocore-backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.backend
     container_name: astrocore-backend
-    ports:
-      - "8000:8000"
     environment:
       TZ: Asia/Shanghai
     volumes:
-      # 自定义数据库目录
-      - C:/AstroCoreData/data:/app/backend/data
+      - E:/AstroCoreData/data:/app/backend/data
+      - E:/AstroCoreData/storage:/app/backend/storage
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
 
-      # 自定义上传文件目录
-      - C:/AstroCoreData/storage:/app/backend/storage
+  astrocore-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: astrocore-frontend
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "3000:80"
+    depends_on:
+      - astrocore-backend
     restart: unless-stopped
