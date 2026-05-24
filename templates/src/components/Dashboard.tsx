@@ -272,9 +272,7 @@ export default function Dashboard({ user, onLogout, onUserUpdated }: DashboardPr
 
         <header className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 z-10">
           <h2 className="text-lg font-bold tracking-tight text-slate-900">
-            {activeLabel}
-            {activeTab === 'my' && selectedDashboard && <span className="text-slate-300 mx-2 font-light">/</span>}
-            {activeTab === 'my' && selectedDashboard?.name}
+            {activeTab === 'my' && selectedDashboard ? selectedDashboard.name : activeLabel}
           </h2>
           <div className="flex items-center space-x-4">
             <div className="relative hidden md:block">
@@ -303,7 +301,7 @@ export default function Dashboard({ user, onLogout, onUserUpdated }: DashboardPr
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-8 relative">
+        <div className={cn('flex-1 overflow-y-auto relative', activeTab === 'my' && selectedDashboard ? 'p-4' : 'p-8')}>
           {activeTab === 'my' && !selectedDashboard && (
             <div className="h-full flex flex-col items-center justify-center space-y-6">
               <div className="w-24 h-24 rounded-[2rem] bg-white shadow-xl shadow-slate-200 flex items-center justify-center border border-slate-100">
@@ -317,8 +315,8 @@ export default function Dashboard({ user, onLogout, onUserUpdated }: DashboardPr
           )}
 
           {activeTab === 'my' && selectedDashboard && (
-            <div className="space-y-6">
-              <div className="glass-dark p-4 rounded-2xl flex flex-wrap gap-4 items-center">
+            <div className="h-full min-h-[calc(100vh-6rem)]">
+              <div className="hidden">
                 <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-sm">
                   <Calendar className="w-4 h-4 text-blue-600" />
                   <span className="text-xs font-semibold">2024-01-01 - 2024-12-31</span>
@@ -334,17 +332,16 @@ export default function Dashboard({ user, onLogout, onUserUpdated }: DashboardPr
                 </button>
               </div>
 
-              <div className="bg-white rounded-[2.5rem] p-3 shadow-2xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden min-h-[680px]">
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600" />
+              <div className="bg-white rounded-xl p-1 shadow-xl shadow-slate-200/40 border border-slate-100 relative overflow-hidden min-h-[calc(100vh-7rem)]">
                 {dashboardView?.iframe_url ? (
                   <iframe
                     key={frameKey}
                     src={assetUrl(dashboardView.iframe_url) || undefined}
                     title={selectedDashboard.name}
-                    className="w-full h-[650px] rounded-[2rem] border-0 bg-white"
+                    className="w-full h-[calc(100vh-7.5rem)] min-h-[720px] rounded-lg border-0 bg-white"
                   />
                 ) : (
-                  <div className="h-[650px] flex items-center justify-center text-slate-400">
+                  <div className="h-[calc(100vh-7.5rem)] min-h-[720px] flex items-center justify-center text-slate-400">
                     <div className="text-center space-y-3">
                       <LayoutDashboard className="w-14 h-14 mx-auto text-slate-300" />
                       <p className="text-sm font-bold">该看板还没有上传 HTML 文件</p>

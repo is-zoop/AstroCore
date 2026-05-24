@@ -12,8 +12,10 @@ export type ApiUser = {
 export type DashboardRecord = {
   id: number;
   name: string;
+  description?: string;
   category: string;
   icon: string;
+  dataset_ids?: number[];
   dataset_id?: number | null;
   dataset?: string;
   status: 'published' | 'draft' | 'offline';
@@ -21,6 +23,19 @@ export type DashboardRecord = {
   updated_at?: string;
   file_url?: string | null;
   iframe_url?: string | null;
+};
+
+export type ApiKeyRecord = {
+  id: number;
+  name: string;
+  key_prefix: string;
+  key_mask: string;
+  key?: string;
+  permission: 'public_data';
+  status: 'active' | 'disabled';
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export const assetUrl = (url?: string | null) => {
@@ -60,12 +75,16 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
 
 export const api = {
   baseUrl: API_BASE_URL,
+
+  // Auth
   login: (username: string, password: string) =>
     apiRequest<{ access_token: string; expires_in: number; user: ApiUser }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
     }),
   me: () => apiRequest<ApiUser>('/api/auth/me'),
+
+  // System settings
   systemSettings: () => apiRequest<any>('/api/system-settings'),
   updateSystemSettings: (payload: any) =>
     apiRequest<any>('/api/system-settings', { method: 'PUT', body: JSON.stringify(payload) }),
@@ -75,6 +94,8 @@ export const api = {
     return apiRequest<any>('/api/system-settings/logo', { method: 'POST', body: form });
   },
   deleteLogo: () => apiRequest<any>('/api/system-settings/logo', { method: 'DELETE' }),
+
+  // Dashboards
   dashboards: (keyword = '') =>
     apiRequest<DashboardRecord[]>(`/api/dashboards${keyword ? `?keyword=${encodeURIComponent(keyword)}` : ''}`),
   createDashboard: (payload: any) =>
@@ -90,6 +111,10 @@ export const api = {
   dashboardView: (id: number) => apiRequest<DashboardRecord>(`/api/dashboards/${id}/view`),
   searchDashboards: (keyword: string) =>
     apiRequest<DashboardRecord[]>(`/api/search/dashboards?keyword=${encodeURIComponent(keyword)}`),
+  dashboardDataByName: (name: string, apiKey?: string) =>
+    apiRequest<any>(`/api/public/dashboards/by-name/data?name=${encodeURIComponent(name)}`, apiKey ? { headers: { 'X-API-Key': apiKey } } : {}),
+
+  // Datasets
   datasets: (keyword = '') =>
     apiRequest<any[]>(`/api/datasets${keyword ? `?keyword=${encodeURIComponent(keyword)}` : ''}`),
   createDataset: (payload: any) =>
@@ -98,6 +123,22 @@ export const api = {
     apiRequest<any>(`/api/datasets/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   deleteDataset: (id: number) => apiRequest(`/api/datasets/${id}`, { method: 'DELETE' }),
   previewDataset: (id: number) => apiRequest<any>(`/api/datasets/${id}/preview`, { method: 'POST' }),
+  datasetDataByName: (name: string) =>
+    apiRequest<any>(`/api/datasets/by-name/data?name=${encodeURIComponent(name)}`),
+  uploadTableFileSheets: (file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return apiRequest<{ temp_id: string; filename: string; sheets: string[] }>('/api/table-files/sheets', {
+      method: 'POST',
+      body: form,
+    });
+  },
+  createTableDataset: (payload: any) =>
+    apiRequest<any>('/api/datasets/table', { method: 'POST', body: JSON.stringify(payload) }),
+  updateTableDataset: (id: number, payload: any) =>
+    apiRequest<any>(`/api/datasets/${id}/table`, { method: 'PUT', body: JSON.stringify(payload) }),
+
+  // Datasources
   datasources: () => apiRequest<any[]>('/api/datasources'),
   createDatasource: (payload: any) =>
     apiRequest<any>('/api/datasources', { method: 'POST', body: JSON.stringify(payload) }),
@@ -105,6 +146,16 @@ export const api = {
     apiRequest<any>(`/api/datasources/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   deleteDatasource: (id: number) => apiRequest(`/api/datasources/${id}`, { method: 'DELETE' }),
   testDatasource: (id: number) => apiRequest<any>(`/api/datasources/${id}/test`, { method: 'POST' }),
+
+  // API keys
+  apiKeys: () => apiRequest<ApiKeyRecord[]>('/api/api-keys'),
+  createApiKey: () =>
+    apiRequest<ApiKeyRecord>('/api/api-keys', { method: 'POST' }),
+  updateApiKey: (id: number, payload: { status: string; regenerate?: boolean }) =>
+    apiRequest<ApiKeyRecord>(`/api/api-keys/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  deleteApiKey: (id: number) => apiRequest(`/api/api-keys/${id}`, { method: 'DELETE' }),
+
+  // Users
   users: () => apiRequest<ApiUser[]>('/api/users'),
   createUser: (payload: any) => apiRequest<ApiUser>('/api/users', { method: 'POST', body: JSON.stringify(payload) }),
   updateUser: (id: number, payload: any) =>

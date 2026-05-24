@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Database, Edit2, Inbox, Plus, Radio, Trash2, X } from 'lucide-react';
 import { api } from '../../lib/api';
 import { cn } from '../../lib/utils';
+import SoftSelect from './SoftSelect';
 
 const DEFAULT_FORM = {
   name: '',
@@ -14,6 +15,11 @@ const DEFAULT_FORM = {
   status: 'pending',
 };
 const PASSWORD_MASK = '********';
+const SOURCE_TYPE_OPTIONS = [
+  { value: 'mysql', label: 'MySQL' },
+  { value: 'postgresql', label: 'PostgreSQL' },
+  { value: 'sqlserver', label: 'SQL Server' },
+];
 
 function EmptyState() {
   return (
@@ -192,11 +198,12 @@ export default function DatasourceAdmin() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="连接名称" className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />
-              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500">
-                <option value="mysql">MySQL</option>
-                <option value="postgresql">PostgreSQL</option>
-                <option value="sqlserver">SQL Server</option>
-              </select>
+              <SoftSelect
+                value={form.type}
+                placeholder="请选择数据库类型"
+                options={SOURCE_TYPE_OPTIONS}
+                onChange={(value) => setForm({ ...form, type: value })}
+              />
               <input value={form.host} onChange={(e) => setForm({ ...form, host: e.target.value })} placeholder="节点地址" className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />
               <input value={form.port || ''} onChange={(e) => setForm({ ...form, port: e.target.value ? Number(e.target.value) : null })} placeholder="端口" className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />
               <input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="账号" className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />

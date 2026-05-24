@@ -52,8 +52,10 @@ class PasswordUpdate(BaseModel):
 
 class DashboardPayload(BaseModel):
     name: str
+    description: str = ""
     category: str = ""
     icon: str = "BarChart3"
+    dataset_ids: list[int] = []
     dataset_id: int | None = None
     status: str = "draft"
 
@@ -62,6 +64,13 @@ class DatasetPayload(BaseModel):
     name: str
     datasource_id: int | None = None
     sql: str = ""
+
+
+class TableDatasetPayload(BaseModel):
+    name: str
+    datasource_id: int
+    temp_id: str
+    sheet_name: str
 
 
 class DatasourcePayload(BaseModel):
@@ -73,6 +82,11 @@ class DatasourcePayload(BaseModel):
     password: str | None = None
     database: str = ""
     status: str = "pending"
+
+
+class ApiKeyUpdate(BaseModel):
+    status: str = "active"
+    regenerate: bool = False
 
 
 class SystemSettingsPayload(BaseModel):

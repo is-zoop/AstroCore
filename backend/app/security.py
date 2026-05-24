@@ -103,6 +103,18 @@ def is_current_encrypted_secret(value: str | None) -> bool:
     return bool(value and value.startswith(SECRET_ENCRYPTION_PREFIX))
 
 
+def generate_api_key() -> str:
+    return f"acpk_{secrets.token_urlsafe(32)}"
+
+
+def hash_api_key(api_key: str) -> str:
+    return hmac.new(JWT_SECRET.encode(), api_key.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def mask_api_key(api_key: str) -> str:
+    return f"{api_key[:4]}{'*' * 28}"
+
+
 def _secret_stream(key: bytes, length: int) -> bytes:
     chunks = []
     counter = 0

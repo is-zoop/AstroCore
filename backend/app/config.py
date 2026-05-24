@@ -7,10 +7,12 @@ DATA_DIR = BASE_DIR / "data"
 STORAGE_DIR = BASE_DIR / "storage"
 DASHBOARD_FILES_DIR = STORAGE_DIR / "dashboard_files"
 UPLOADS_DIR = STORAGE_DIR / "uploads"
+TABLE_UPLOADS_DIR = STORAGE_DIR / "table_uploads"
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DASHBOARD_FILES_DIR.mkdir(parents=True, exist_ok=True)
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+TABLE_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 DATABASE_URL = os.getenv("ASTROCORE_DATABASE_URL", f"sqlite:///{DATA_DIR / 'astrocore.db'}")
 JWT_SECRET = os.getenv("ASTROCORE_JWT_SECRET", "change-this-secret-in-production")

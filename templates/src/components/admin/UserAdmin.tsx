@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { Edit2, Inbox, Key, Plus, Shield, Trash2, UserCheck, X } from 'lucide-react';
 import { api, ApiUser, assetUrl } from '../../lib/api';
 import { cn } from '../../lib/utils';
+import SoftSelect from './SoftSelect';
 
-const DEFAULT_FORM = { username: '', email: '', password: 'Password123', role: 'viewer', status: 'active' };
+const DEFAULT_FORM = { username: '', email: '', password: '', role: 'viewer', status: 'active' };
 
 function EmptyState() {
   return (
@@ -63,6 +64,7 @@ export default function UserAdmin() {
       if (editing) {
         await api.updateUser(editing.id, { email: form.email, role: form.role, status: form.status });
       } else {
+        if (!form.password.trim()) throw new Error('请输入初始密码');
         await api.createUser(form);
       }
       await load();
@@ -151,9 +153,9 @@ export default function UserAdmin() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={cn('inline-flex items-center space-x-2 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest', u.status === 'active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100')}>
+                      <span className={cn('inline-flex items-center space-x-2 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest', u.status === 'active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : u.status === 'cancelled' ? 'bg-slate-100 text-slate-500 border border-slate-200' : 'bg-amber-50 text-amber-600 border border-amber-100')}>
                         <UserCheck className="w-3 h-3" />
-                        <span>{u.status === 'active' ? '已激活' : '待处理'}</span>
+                        <span>{u.status === 'active' ? '已激活' : u.status === 'cancelled' ? '已注销' : '待处理'}</span>
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -186,15 +188,26 @@ export default function UserAdmin() {
               {!editing && (
                 <input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="初始密码" className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500" />
               )}
-              <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500">
-                <option value="system_admin">系统管理员</option>
-                <option value="admin">管理员</option>
-                <option value="viewer">普通用户</option>
-              </select>
-              <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500">
-                <option value="active">已激活</option>
-                <option value="pending">待处理</option>
-              </select>
+              <SoftSelect
+                value={form.role}
+                placeholder="请选择角色"
+                options={[
+                  { value: 'system_admin', label: '系统管理员' },
+                  { value: 'admin', label: '管理员' },
+                  { value: 'viewer', label: '普通用户' },
+                ]}
+                onChange={(value) => setForm({ ...form, role: value })}
+              />
+              <SoftSelect
+                value={form.status}
+                placeholder="请选择状态"
+                options={[
+                  { value: 'active', label: '已激活' },
+                  { value: 'pending', label: '待处理' },
+                  { value: 'cancelled', label: '已注销' },
+                ]}
+                onChange={(value) => setForm({ ...form, status: value })}
+              />
             </div>
             {error && <p className="mt-4 text-xs text-red-500">{error}</p>}
             <div className="mt-8 flex justify-end gap-3">

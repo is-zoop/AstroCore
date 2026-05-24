@@ -34,6 +34,9 @@ class Dataset(Base, TimestampMixin):
     datasource_id = Column(Integer, ForeignKey("datasources.id"), nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     sql = Column(Text, default="", nullable=False)
+    table_name = Column(String(255), default="", nullable=False)
+    table_file_name = Column(String(255), default="", nullable=False)
+    table_sheet_name = Column(String(255), default="", nullable=False)
 
     owner = relationship("User", back_populates="datasets")
     datasource = relationship("Datasource", back_populates="datasets")
@@ -45,8 +48,10 @@ class Dashboard(Base, TimestampMixin):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
+    description = Column(Text, default="", nullable=False)
     category = Column(String(120), default="", nullable=False)
     icon = Column(String(80), default="BarChart3", nullable=False)
+    dataset_ids = Column(String(500), default="", nullable=False)
     dataset_id = Column(Integer, ForeignKey("datasets.id"), nullable=True)
     status = Column(String(32), default="draft", nullable=False)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -71,6 +76,21 @@ class Datasource(Base, TimestampMixin):
     status = Column(String(32), default="pending", nullable=False)
 
     datasets = relationship("Dataset", back_populates="datasource")
+
+
+class ApiKey(Base, TimestampMixin):
+    __tablename__ = "api_keys"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(120), nullable=False)
+    key_hash = Column(String(128), unique=True, index=True, nullable=False)
+    key_prefix = Column(String(24), nullable=False)
+    key_encrypted = Column(Text, nullable=True)
+    permission = Column(String(64), default="public_data", nullable=False)
+    status = Column(String(32), default="active", nullable=False)
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    created_by = relationship("User")
 
 
 class SystemSettings(Base):

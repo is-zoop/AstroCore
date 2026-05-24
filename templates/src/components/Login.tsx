@@ -122,7 +122,7 @@ export default function Login({ onLogin }: { onLogin: (token: string, user: ApiU
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
               TLS_SESSION: ACTIVE
             </span>
-            <span>admin/admin · demo/demo</span>
+            <span>Secure Enterprise Authentication</span>
           </footer>
         </div>
       </motion.div>
